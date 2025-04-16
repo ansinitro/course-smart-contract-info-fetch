@@ -1,29 +1,12 @@
+import './scripts/interfaces'
+import { getEventsUrl } from './utils/generateLinks';
+
 const ENROLLED_MESSAGE = "You have successfully enrolled to the course!";
 const STUDENT_ADDRESS = "0QC4hAk6Xhs4UY3dPZ3o0UbR5dnV4EeO-6I0dp13fYcsjAxo";
 
-// Define types for the API response structure
-interface TonTransferAction {
-    type: string;
-    status: string;
-    TonTransfer: {
-        comment: string;
-        sender: {
-            address: string;
-        };
-    };
-}
-
-interface Event {
-    in_progress: boolean;
-    actions: TonTransferAction[];
-}
-
-interface ApiResponse {
-    events: Event[];
-}
 async function getEnrolledCourses(studentAddress: string): Promise<string[]> {
     let enrolledCourses: string[] = [];
-    let response = await fetch(`https://testnet.tonapi.io/v2/accounts/${studentAddress}/events?limit=100`);
+    let response = await fetch(getEventsUrl(studentAddress, 100));
     
     const { events }: ApiResponse = await response.json(); 
     events.forEach(e => {
