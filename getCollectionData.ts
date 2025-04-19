@@ -13,8 +13,9 @@ async function getCollectionData(contractAddress: string): Promise<{ collectionC
 
         if (data.success) {
             // Extract collection data from the 'decoded' field
-            const collectionContent = data.decoded.collection_content;
+            let collectionContent = data.decoded.collection_content;
             const ownerAddress = data.decoded.owner_address;
+            collectionContent = getLink(hexToUtf8(collectionContent))
             return { collectionContent, ownerAddress };
         } else {
             throw new Error('Failed to fetch collection data: ' + JSON.stringify(data));
@@ -36,3 +37,23 @@ async function getCollectionData(contractAddress: string): Promise<{ collectionC
         console.error('Failed to get collection data:', error);
     }
 })();
+
+
+
+
+
+function hexToUtf8(hex: string): string {
+    let str = '';
+    for (let i = 0; i < hex.length; i += 2) {
+        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    }
+
+    return str;
+}
+
+function getLink(utf8: string): string {
+    const ipfsHash = utf8.split("//")[1];  // Remove the "ipfs://" prefix
+    const ipfsUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
+
+    return ipfsUrl;  // This will give the full URL
+}
